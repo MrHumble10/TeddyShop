@@ -74,12 +74,14 @@ class Cart(db.Model):
     __tablename__ = 'cart'
     id = db.Column(db.Integer, primary_key=True)
     product_name = db.Column(db.String, nullable=False)
-    product_id = db.Column(db.Integer, db.ForeignKey('product.id'))
+    product_id = db.Column(db.Integer, nullable=False)
+    # product_id = db.Column(db.Integer, db.ForeignKey('product.id'))
     product_img = db.Column(db.String, nullable=False)
     product_price = db.Column(db.Float, nullable=False)
     product_info = db.Column(db.String, nullable=False)
     product_total = db.Column(db.Float, nullable=False)
-    customer_id = db.Column(db.Integer, db.ForeignKey('users.id'))
+    customer_id = db.Column(db.Integer, nullable=False)
+    # customer_id = db.Column(db.Integer, db.ForeignKey('users.id'))
     created = db.Column(db.String, nullable=False)
     modified = db.Column(db.String, nullable=False)
     quantity = db.Column(db.Integer, nullable=False)
@@ -88,9 +90,11 @@ class Cart(db.Model):
 class Favorite(db.Model):
     __tablename__ = 'favorites'
     id = db.Column(db.Integer, primary_key=True)
-    product_id = db.Column(db.Integer, db.ForeignKey('product.id'))
+    product_id = db.Column(db.Integer, nullable=False)
+    # product_id = db.Column(db.Integer, db.ForeignKey('product.id'))
     product_price = db.Column(db.Float, nullable=False)
-    customer_id = db.Column(db.Integer, db.ForeignKey('users.id'))
+    customer_id = db.Column(db.Integer, nullable=False)
+    # customer_id = db.Column(db.Integer, db.ForeignKey('users.id'))
     created = db.Column(db.String, nullable=False)
 
 # CONFIGURE TABLE
@@ -251,7 +255,7 @@ def view_pdt(pdt_id):
             product_info=product.about,
             customer_id=current_user.id,
             quantity=request.form['quantity'],
-            product_total=round(product.price * float(request.form['quantity']),2),
+            product_total=product.price * float(request.form['quantity']),
             created=dt.datetime.now().strftime("%Y-%m-%d"),
             modified=dt.datetime.now().strftime("%H:%M:%S")
         )
