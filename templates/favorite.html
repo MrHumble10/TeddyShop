@@ -1,0 +1,42 @@
+{%include "header.html"%}
+
+    <!-- Custom styles for this template -->
+        <link
+      href="{{ url_for('static', filename='css/carousel.css') }}"
+      rel="stylesheet"
+    />
+  <body style="background: rgb(130, 18, 32) ">
+
+
+
+<main>
+
+
+
+  <!-- Marketing messaging and featurettes
+  ================================================== -->
+  <!-- Wrap the rest of the page in another container to center all the content. -->
+
+  <div class="container marketing py-5 ">
+    <!-- Three columns of text below the carousel -->
+    <div class="row py-5">
+    {%for fav in fav_items%}
+      {%if current_user.is_authenticated and fav.customer_id == current_user.id:%}
+      {%for pdt in products%}
+      {%if pdt.id == fav.product_id and fav.customer_id == current_user.id%}
+          <div class="col-lg-3 py-1 my-1 ">
+            <div class="py-1 "> <img class=" bd-placeholder-img rounded-circle  opacity-75" width="180" height="180" src="{{pdt.img_url}}" role="img" aria-label="Placeholder" preserveAspectRatio="xMidYMid slice" focusable="false"></div>
+            <p class=" heading  text-white mx-5 " style="padding-left:2%">R${{'%0.2f'|format(pdt.price|float)}}</p>
+          </div>
+
+
+      {%endif%}
+      {%endfor%}
+      {%endif%}
+      {%endfor%}
+
+    </div><!-- /.row -->
+  </div>
+    </div>
+</main>
+{%include "footer.html"%}

@@ -1,0 +1,122 @@
+{%include "header.html"%}
+
+<!-- Product section-->
+<header
+  class="masthead "
+  style="background-image: url('../static/assets/img/teddy-mas.jpg'); border-radius: 15%;height:45rem"
+
+>
+
+<div class="container position-relative px-4 px-lg-5">
+  {%if logged_in or current_user.id == 1%}
+  <div class="position-absolute top-100 start-50 translate-middle ">
+      <a class="btn btn-outline-light fs-5" type="submit" href="{{url_for('add_pdt')}}" style="margin-top:3cm" >
+          ADD <i class="bi bi-file-earmark-plus-fill fs-5 mb-5"></i>
+      </a>
+  </div>
+  {%endif%}
+<div class="row gx-4 gx-lg-5 justify-content-center">
+  <div class="col-md-10 col-lg-8 col-xl-7">
+    <div class="site-heading">
+      {% with messages = get_flashed_messages() %}
+        {% if messages %}
+          {% for message in messages %}
+            <p class=flashes style="font-weight: bold;color:#EB1D36">{{ message }}</p>
+          {% endfor %}
+       {% endif %}
+      {% endwith %}
+      <h1>Teddy Shop</h1>
+      <span class="subheading">Buy Your Teddy</span>
+    </div>
+  </div>
+</div>
+</div>
+</header>
+    <!-- Related items section-->
+    <section class=" masthead" style="background: rgb(130, 18, 32)">
+        <div class="container px-4 px-lg-5">
+            <h1 class="fw-bolder text-white mb-4 pb-5">Products</h1>
+            <div class="row gx-4 gx-lg-5 row-cols-2 row-cols-md-3 row-cols-xl-4 justify-content-center">
+                {%for pdt in products%}
+                <div class="col mb-5">
+                    <div class="card h-100">
+
+                        {%if logged_in or current_user.id == 1%}
+
+                        <!-- Sale del-->
+                        <div class="badge bg-danger text-white position-absolute " style="top: 6cm; left: 0.5rem">
+                            <a class=" text-white"  href="{{url_for('delete',pdt_id=pdt.id)}}">Del </a>
+
+
+                        </div>
+                        <!-- Sale edit-->
+                        <div class="badge bg-primary text-white position-absolute" style="top: 7cm; left: 0.5rem">
+                                                            <a class=" text-white" href="{{url_for('edit_pdt',pdt_id=pdt.id)}}">Edit</a>
+
+                        </div>
+                        {%endif%}
+                                                    <div class=" text-white position-absolute" style="top: 0.5rem; left: 0.5rem">
+                                    <a data-original-title="Save to Wishlist" title="" href="{{url_for('add_fav', id=pdt.id)}}"
+                                                     data-abc="true">
+
+                                                   <i class="bi bi-heart fs-3"></i>
+                                    </a>
+                                </div>
+                        {%for fav in fav_items:%}
+
+                        {%if  fav.product_id == pdt.id and fav.customer_id == current_user.id%}
+                        <div class=" text-white position-absolute" style="top: 0.5rem; left: 0.5rem">
+                                <a data-original-title="Save to Wishlist" title="" href="{{url_for('del_fav', pdt_id=fav.id)}}"
+                                                 data-abc="true">
+
+                                               <i class="bi bi-heart-fill fs-3 text-danger"></i>
+                                </a>
+                            </div>
+                        {%endif%}
+                        {%endfor%}
+
+
+
+
+                        <!-- Product image-->
+                        <img class="card-img-top" src="{{pdt.img_url}}" alt="..." />
+                        <!-- Product details-->
+                        <div class="card-body p-4">
+                            <div class="text-center">
+                                <!-- Product name-->
+                                <h5 class="fw-bolder">{{pdt.name}}</h5>
+                                <!-- Product reviews-->
+                                <div class="d-flex justify-content-center small text-warning mb-2">
+                                    <div class="bi-star-fill"></div>
+                                    <div class="bi-star-fill"></div>
+                                    <div class="bi-star-fill"></div>
+                                    <div class="bi-star-fill"></div>
+                                    <div class="bi-star-fill"></div>
+                                </div>
+                                {%if pdt.in_sale == '1'%}
+                                    <!-- Sale badge-->
+                                    <div class="badge bg-dark text-white position-absolute " style="top: 0.5rem; right: 0.5rem">Sale</div>
+                                    <span class="text-muted text-decoration-line-through">R${{'%0.2f'|format(pdt.price|float)}}</span>
+                                    R${{'%0.2f'|format(pdt.total|float)}}
+                                {%else%}
+                                <!-- Product price-->
+                                    R${{'%0.2f'|format(pdt.price|float)}}
+                                {%endif%}
+                            </div>
+                        </div>
+                        <!-- Product actions-->
+                        <div class="card-footer p-4 pt-0 border-top-0 bg-transparent">
+                            <div class="text-center">
+                                <a class="btn btn-outline-dark mt-auto" href="{{url_for('view_pdt',pdt_id=pdt.id)}}" aria-disabled="true">
+                                    View options
+                                </a>
+
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                {%endfor%}
+            </div>
+        </div>
+    </section>
+{%include "footer.html"%}

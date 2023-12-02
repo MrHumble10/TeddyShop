@@ -1,0 +1,143 @@
+      {%block title%}
+    <title>Cart</title>
+      {%endblock%}
+{%include 'header.html'%}
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.1/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet">
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+    <link
+      href="{{ url_for('static', filename='css/cart_styles.css') }}"
+      rel="stylesheet"
+    />
+          <link
+      rel="icon"
+      type="image/x-icon"
+      href="{{ url_for('static', filename='assets/favicon.ico') }}"
+    />
+  </head>
+  <body class="snippet-body">
+
+  <div class="container-fluid">
+        <div class="row">
+            <aside class="col-lg-9">
+                <div class="card my-5 bg-dark">
+                    <div class="table-responsive my-5">
+                        <table class="table table-borderless table-shopping-cart">
+                            <thead class="text-muted">
+                                <tr class="small text-uppercase">
+                                    <th scope="col">Product</th>
+                                    <th scope="col" width="120">Quantity</th>
+                                    <th scope="col" width="120">Price</th>
+                                    <th scope="col" class="text-right d-none d-md-block" width="200"></th>
+                                </tr>
+                            </thead>
+                            <tbody>
+
+                            {%for item in cart_items%}
+                            {%if item.customer_id == current_user.id%}
+                                <tr>
+                                    <td>
+                                        <a rel="stylesheet" href="{{url_for('view_pdt',pdt_id=item.product_id)}}">
+                                        <figure class="itemside align-items-center text-white">
+                                            <div class="aside"><img src="{{item.product_img}}" class="img-sm rounded"></div>
+                                            <figcaption class="info"> <a href="#" class="title text-white" data-abc="true">{{item.product_name}}</a>
+                                                <p class="text-muted small">{{item.product_info|safe}}</p>
+                                            </figcaption>
+                                        </figure>
+                                        </a>
+
+                                    </td>
+
+                                    <td> <input class="form-control text-center"  type="num" value="{{item.quantity}}"  readonly>
+
+                                         </td>
+
+                                    <td>
+                                        <div class="price-wrap"> <var class="price text-white">R${{'%0.2f'|format(item.product_total|float)}}</var> <small class="text-muted text-white"> R${{'%0.2f'|format(item.product_price|float)}} each </small> </div>
+                                    </td>
+                                    <td class="text-right d-none d-md-block">
+
+
+                                        <a href="{{url_for('delete_item', pdt_id=item.id)}}"
+                                            class="btn btn-light" data-abc="true"> Remove</a>
+                                    </td>
+
+                                </tr>
+
+
+
+                            {%endif%}
+                            {%endfor%}
+                            </tbody>
+
+                        </table>
+
+                    </div>
+                </div>
+            </aside>
+            <aside class="col-lg-3">
+                <div class="card mb-3 my-5 ">
+                    <div class="card-body bg-dark">
+                        <form name="f">
+                            <div class="form-group my-5 text-white"> <label>Have coupon?</label>
+                                <div class="input-group ">
+                                    <form action="{{url_for('cart')}}" method="post">
+                                        <input type="text" class="form-control coupon" name="coupon" placeholder="Coupon code">
+                                        <span class="input-group-append">
+                                            <button class="btn btn-primary btn-apply coupon">Apply</button>
+                                        </span>
+                                    </form>
+                                </div>
+                            </div>
+                            <div>
+                                {% with messages = get_flashed_messages() %}
+                                    {% if messages %}
+                                      {% for message in messages %}
+                                        <p class='flashes opacity' style="font-weight: bold;color:#EB1D36; text-align:center">{{ message }}</p>
+                                      {% endfor %}
+                                   {% endif %}
+                                {% endwith %}
+                            </div>
+                            <input name="to" id="to" value="{{total_price - discount}}" type="hidden">
+                        </form>
+                    </div>
+                </div>
+                <div class="card my-5 text-white">
+                    <div class="card-body bg-dark ">
+                        <dl class="dlist-align">
+                            <dt>Subtotal:</dt>
+                            <dd class="text-right ml-3">R${{'%0.2f'|format(total_price|float)}}</dd>
+                        </dl>
+                        <dl class="dlist-align">
+                            <dt>Discounts:</dt>
+                            <dd class="text-right text-danger ml-3">- R${{'%0.2f'|format(discount|float)}}</dd>
+                        </dl>
+
+
+                        <dl class="dlist-align">
+                            <dt>Total:</dt>
+                            <dd class="text-right   ml-3"><strong >R${{'%0.2f'|format(total_price - discount|float)}}</strong></dd>
+                        </dl>
+                        <hr> <a href="#" class="btn btn-out btn-primary btn-square btn-main" data-abc="true"> Make Purchase </a> <a href="{{url_for('home')}}" class="btn btn-out btn-success btn-square btn-main mt-2" data-abc="true">Continue Shopping</a>
+                    </div>
+                </div>
+            </aside>
+
+        </div>
+    </div>
+    <script type="text/javascript" src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.1/js/bootstrap.bundle.min.js"></script>
+    <script type="text/javascript" src="#"></script>
+    <script type="text/javascript" src="#"></script>
+    <script type="text/javascript" src="#"></script>
+    <script type="text/javascript">#</script>
+    <script type="text/javascript">var myLink = document.querySelector('a[href="#"]');
+    myLink.addEventListener('click', function(e) {
+      e.preventDefault();
+    });</script>
+
+</body></html>

@@ -1,0 +1,48 @@
+{%include "header.html"%}
+
+<form method="post" action="{{url_for('view_pdt',pdt_id=product.id)}}" class="py-5">
+            <div class="container px-4 px-lg-5 my-5 text-white">
+                <div class="row gx-4 gx-lg-5 align-items-center">
+                    <div class="col-md-6"><img class="card-img-top mb-5 mb-md-0 rounded" src="{{product.img_url}}" alt="..." /></div>
+                    <div class="col-md-6">
+                        <div class="small mb-1">Product: PDT-{{product.id}}</div>
+                        <h1 class="display-5 fw-bolder">Get Your {{product.name}}</h1>
+                        <div class="fs-5 mb-5">
+                            {%if product.in_sale == '1'%}
+                                <!-- Sale badge-->
+                                <span class=" text-decoration-line-through text-danger">${{product.price}}0</span>
+                                ${{product.total}}0
+                            {%else%}
+                                <!-- Product price-->
+                                ${{product.price}}0
+                            {%endif%}
+                        </div>
+                        <div class="container">
+                            <p class="lead">{{product.about|safe}}</p>
+                        </div>
+                        <div class="small mb-1">In-Stock: {{product.stock}}</div>
+
+                        <div class="d-flex">
+                            <input class="form-control text-center me-3" value="1" name="quantity" id="inputQuantity" type="num"
+                                   style="max-width: 4rem" />
+                            <button class="btn btn-outline-dark flex-shrink-0" type="submit">
+                                <i class="bi-cart-fill me-1"></i>
+                                Add to cart
+                            </button>
+
+                        </div>
+                        <div>
+                                {% with messages = get_flashed_messages() %}
+                                    {% if messages %}
+                                      {% for message in messages %}
+                                        <p class='flashes opacity text-white' style="font-weight: bold">{{ message }}</p>
+                                      {% endfor %}
+                                   {% endif %}
+                                {% endwith %}
+                            </div>
+
+                    </div>
+                </div>
+            </div>
+        </form>
+{%include "footer.html"%}
