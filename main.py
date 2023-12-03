@@ -421,7 +421,7 @@ def delete(pdt_id):
 @app.route('/delete_item<int:pdt_id>')
 def delete_item(pdt_id):
     pdt_to_del = db.get_or_404(Cart, pdt_id)
-    pdt = db.get_or_404(Product, pdt_id)
+    pdt = db.get_or_404(Product, pdt_to_del.product_id)
     pdt.stock += pdt_to_del.quantity
     db.session.delete(pdt_to_del)
     db.session.commit()
