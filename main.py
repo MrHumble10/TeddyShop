@@ -18,7 +18,7 @@ from notifications import send_email
 today = dt.datetime.now()
 
 app = Flask(__name__)
-app.config['SECRET_KEY'] = 'jklkjlkjlkjlkjlkj'
+app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY')
 # os.environ.get('SECRET_KEY')
 Bootstrap5(app)
 
