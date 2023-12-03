@@ -397,23 +397,27 @@ def contact():
 @app.route('/delete<int:pdt_id>')
 @admin_only
 def delete(pdt_id):
+    result = db.session.execute(db.Select(Favorite))
+    favorites = result.scalars().all()
+
+    result = db.session.execute(db.Select(Cart))
+    cart_items = result.scalars().all()
 
     pdt_to_del = db.get_or_404(Product, pdt_id)
+    for item in cart_items:
+        if item.product_id == pdt_id:
+            db.session.delete(item)
+            db.session.commit()
 
-    item = db.session.execute(db.Select(Cart).where(Cart.product_id == pdt_id)).scalar()
-    crt_to_del = item
-    pdt_to_del.stock += crt_to_del.quantity
-    db.session.delete(crt_to_del)
     db.session.delete(pdt_to_del)
     db.session.commit()
 
-    # for item in favorites:
-    #     if item.product_id == pdt_id:
-    #         print(item.id)
-    #         del_fav(item.id)
+    for item in favorites:
+        if item.product_id == pdt_id:
+            del_fav(item.id)
 
-    fav_to_del = db.session.execute(db.Select(Favorite).where(Favorite.product_id == pdt_id)).scalar()
-    del_fav(fav_to_del.id)
+    # fav_to_del = db.session.execute(db.Select(Favorite).where(Favorite.product_id == pdt_id)).scalar()
+    # del_fav(fav_to_del.id)
     return redirect(url_for('home'))
 
 
