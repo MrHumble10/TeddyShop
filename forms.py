@@ -33,4 +33,10 @@ class MakeCart(FlaskForm):
     submit = SubmitField("Purchase")
 
 
+class PassForgot(FlaskForm):
+    email = EmailField("Email", validators=[DataRequired()])
+    password = PasswordField("Password", validators=[DataRequired()])
+    config_password = PasswordField("Configure Password", validators=[DataRequired()])
+    submit = SubmitField("Change")
+
 
