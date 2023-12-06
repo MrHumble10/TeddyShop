@@ -1,25 +1,24 @@
 from __future__ import print_function
 
-import random
 from itertools import product
 
 from flask import Flask, render_template, redirect, url_for, request, flash, abort
 from flask_bootstrap import Bootstrap5
 from flask_sqlalchemy import SQLAlchemy
 from flask_ckeditor import CKEditor
-from forms import ProductPost, RegisterForm, MakeCart, PassForgot
+from forms import ProductPost, RegisterForm, MakeCart
 import datetime as dt
 from werkzeug.security import generate_password_hash, check_password_hash
 from flask_login import UserMixin, LoginManager, login_user, current_user, logout_user
 from functools import wraps
 from flask_gravatar import Gravatar
 import os
-from notifications import send_email, send_code
+from notifications import send_email
 
 today = dt.datetime.now()
 
 app = Flask(__name__)
-app.config['SECRET_KEY'] = 'lkbljhgcjgfnvbhnm'
+app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY')
 # os.environ.get('SECRET_KEY')
 Bootstrap5(app)
 
@@ -69,6 +68,8 @@ class Product(db.Model):
     img_url = db.Column(db.String(250), nullable=False)
 
 
+
+
 class Cart(db.Model):
     __tablename__ = 'cart'
     id = db.Column(db.Integer, primary_key=True)
@@ -95,7 +96,6 @@ class Favorite(db.Model):
     customer_id = db.Column(db.Integer, nullable=False)
     # customer_id = db.Column(db.Integer, db.ForeignKey('users.id'))
     created = db.Column(db.String, nullable=False)
-
 
 # CONFIGURE TABLE
 # class BlogPost(db.Model):
@@ -126,6 +126,7 @@ def admin_only(f):
         return f(*args, **kwargs)
 
     return decorated_function
+
 
 
 @app.route("/register", methods=["GET", "POST"])
@@ -181,67 +182,6 @@ def login():
         return redirect(url_for('home'))
 
     return render_template('login.html', logged_in=current_user.is_authenticated)
-
-
-code = ""
-
-
-def make_code():
-    global code
-    confirm_code = [random.randint(0, 9) for _ in range(0, 6)]
-    code = 'TDS-' + "".join(str(x) for x in confirm_code)
-    return code
-
-PASS_CHANGE_EMAIL = ""
-@app.route("/pass_forget", methods=["GET", "POST"])
-def pass_forgot():
-    global PASS_CHANGE_EMAIL
-
-    if request.method == "POST":
-        PASS_CHANGE_EMAIL = request.form['email']
-        email = request.form['email']
-        user = db.session.execute(db.Select(User).where(User.email == email)).scalar()
-        if not user:
-            flash("Sorry!, there is not such email!!!")
-
-        else:
-            make_code()
-            send_code(username=f"{user.name} {user.surname}",
-                      email=email,
-                      msg=code)
-            flash("A code has been sent to your email.")
-            return redirect(url_for('pass_forgot'))
-    return render_template("pass_forgot.html", item_num=item_num)
-
-
-@app.route("/check_code", methods=["GET", "POST"])
-def check_code():
-    if request.method == "POST":
-        if request.form["code"] != code:
-            flash("Please enter the correct code.")
-            return redirect(url_for('pass_forgot'))
-        else:
-            make_code()
-            return redirect(url_for('change_pass'))
-
-
-@app.route("/change_pass", methods=["GET", "POST"])
-def change_pass():
-    global PASS_CHANGE_EMAIL
-    if request.method == "POST":
-        new_password_hash = generate_password_hash(password=request.form['new_pass'],
-                                                   method="pbkdf2:sha256",
-                                                   salt_length=8)
-        user = db.session.execute(db.Select(User).where(User.email == PASS_CHANGE_EMAIL)).scalar()
-        print(user.name)
-        if request.form['new_pass'] != request.form['cnf_pass']:
-            flash("Sorry!, password is not configured try again!!!")
-        else:
-            user.password = new_password_hash
-            db.session.commit()
-            return render_template('login.html', logged_in=current_user.is_authenticated)
-
-    return render_template("pass_forgot.html", item_num=item_num, change_pass=True)
 
 
 def days_ago(from_str, to_str):
@@ -301,6 +241,7 @@ def view_pdt(pdt_id):
 
         for item in cart_items:
             if item.product_id == pdt_id and current_user.id == item.customer_id:
+
                 item.quantity += int(request.form['quantity'])
 
                 item.product_total = round(product.price * item.quantity, 2)
@@ -347,11 +288,10 @@ def cart():
         discount += (5 / 100) * cpn
     elif not request.args.get('coupon') is None:
         flash('This coupon is invalid')
-    return render_template('cart.html', item_num=item_num, cart_items=cart_items, total_price=total_price,
-                           discount=discount, is_cart=True)
+    return render_template('cart.html', item_num=item_num, cart_items=cart_items, total_price=total_price, discount=discount, is_cart=True)
 
 
-@app.route("/add", methods=["GET", "POST"])
+@app.route("/add",methods=["GET", "POST"])
 @admin_only
 def add_pdt():
     form = ProductPost()
@@ -374,12 +314,12 @@ def add_pdt():
     return render_template('make_product.html', form=form, item_num=item_num)
 
 
-@app.route("/add_favorite<int:id>", methods=["GET", "POST"])
+@app.route("/add_favorite<int:id>",methods=["GET", "POST"])
 def add_fav(id):
     post_date = dt.datetime.now().strftime("%Y-%m-%d")
     result = db.session.execute(db.Select(Product))
     cart_items = result.scalars().all()
-    for _ in range(len(cart_items)):
+    for _ in range (len(cart_items)):
         pdt = db.get_or_404(Product, id)
         new_fav = Favorite(
             product_id=pdt.id,
@@ -404,6 +344,7 @@ def favorite():
     products = result.scalars().all()
 
     return render_template('favorite.html', item_num=item_num, fav_items=fav_items, products=products)
+
 
 
 @app.route('/edit<int:pdt_id>', methods=['GET', "POST"])
@@ -448,8 +389,7 @@ def contact():
         if request.method == "POST":
             print(request.form["name"])
             send_email(request.form["name"], request.form["email"], request.form["phone"], request.form["message"])
-            return render_template("contact.html", logged_in=current_user.is_authenticated, msg_sent=True,
-                                   item_num=item_num)
+            return render_template("contact.html", logged_in=current_user.is_authenticated, msg_sent=True, item_num=item_num)
 
     return render_template("contact.html", logged_in=current_user.is_authenticated, item_num=item_num)
 
